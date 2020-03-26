@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>0.1.0.0</Version>
+    <Authors>Vinay Sajip</Authors>
+    <Company>Red Dove Consultants Limited</Company>
+    <Product>Red Dove CFG Library</Product>
+    <PackageId>RedDove.Config</PackageId>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Description>A library to handle the CFG configuration format.</Description>
+    <Copyright>Copyright © 2018 Red Dove Consultants Limited</Copyright>
+    <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+    <PackageProjectUrl>https://docs.red-dove.com/cfg/index.html</PackageProjectUrl>
+    <RepositoryUrl>https://bitbucket.org/vinay.sajip/RedDove.Config</RepositoryUrl>
+    <RepositoryType>Mercurial</RepositoryType>
+    <PackageTags>configuration</PackageTags>
+    <!-- PackageReleaseNotes>Release</PackageReleaseNotes -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+    <_Parameter1>$(AssemblyName).Test</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+</Project>
