@@ -1810,23 +1810,35 @@ namespace RedDove.Config
                 throw new ConfigException("@ operand must be a string");
             }
             var fn = (string) o;
-            var p = Path.Combine(config.RootDir, fn);
+            string p = fn;
             var found = false;
             object result;
 
-            if (File.Exists(p))
+            if (Path.IsPathRooted(fn))
             {
-                found = true;
+                if (File.Exists(fn))
+                {
+                    found = true;
+                }
             }
             else
             {
-                foreach (var dn in config.IncludePath)
+                p = Path.Combine(config.RootDir, fn);
+
+                if (File.Exists(p))
                 {
-                    p = Path.Combine(dn, fn);
-                    if (File.Exists(p))
+                    found = true;
+                }
+                else
+                {
+                    foreach (var dn in config.IncludePath)
                     {
-                        found = true;
-                        break;
+                        p = Path.Combine(dn, fn);
+                        if (File.Exists(p))
+                        {
+                            found = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -2676,6 +2688,7 @@ namespace RedDove.Config
                     }
                     else
                     {
+                        int sign = m.Groups[13].Value.Equals("-") ? -1 : 1;
                         int ohour = int.Parse(m.Groups[14].Value);
                         int ominute = int.Parse(m.Groups[15].Value);
                         int osecond = 0;
@@ -2697,7 +2710,7 @@ namespace RedDove.Config
                                                     omillisecond = string.IsNullOrEmpty(v) ? 0 : Convert.ToInt32(double.Parse(v) * 1000);
                                                 }
                          */
-                        var ts = new TimeSpan(0, ohour, ominute, osecond, omillisecond);
+                        var ts = new TimeSpan(0, sign * ohour, sign * ominute, sign * osecond, sign * omillisecond);
                         result = new DateTimeOffset(dt, ts);
                     }
                 }

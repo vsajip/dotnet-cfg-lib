@@ -5,7 +5,6 @@ using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections;
 using System;
-using System.CodeDom;
 using System.Text.RegularExpressions;
 using System.Numerics;
 using System.Diagnostics;
@@ -1305,6 +1304,8 @@ namespace RedDove.Config.Test
             var ldt = new DateTime(2019, 3, 28, 23, 27, 4, 314);
             var offset = new TimeSpan(0, 5, 30, 0);
             Assert.AreEqual(new DateTimeOffset(ldt, offset), test["date_time"]);
+            offset = new TimeSpan(0, -5, -30, 0);
+            Assert.AreEqual(new DateTimeOffset(ldt, offset), test["neg_offset_time"]);
             Assert.AreEqual(new DateTime(2019, 3, 28, 23, 27, 4, 272), test["alt_date_time"]);
             ldt = new DateTime(2019, 3, 28, 23, 27, 4);
             Assert.AreEqual(ldt, test["no_ms_time"]);
@@ -1873,6 +1874,17 @@ namespace RedDove.Config.Test
                     Assert.IsTrue(bie.ToString().Contains("index out of range: "));
                 }
             }
+        }
+
+        [TestMethod]
+        public void AbsoluteIncludePath()
+        {
+            var p = DataFilePath("derived", "test.cfg");
+            var source = $"test: @ '{p.Replace('\\', '/')}'";
+            var reader = new StringReader(source);
+            var cfg = new Config(reader);
+
+            Assert.AreEqual(cfg["test.computed6"], 2L);
         }
     }
 }
