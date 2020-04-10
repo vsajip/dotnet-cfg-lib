@@ -1170,7 +1170,9 @@ namespace RedDove.Config.Test
             {
                 new Tuple<string, string>("foo[1, 2]", "invalid index: expected one value, 2 found"),
                 new Tuple<string, string>("foo[1] bar", null),
-                new Tuple<string, string>("handlers.file/filename", null)
+                new Tuple<string, string>("handlers.file/filename", null),
+                // Have an error in the very first token
+                new Tuple<string, string>("\"handlers.file/filename", null)
             };
 
             foreach (var t in cases)

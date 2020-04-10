@@ -2876,9 +2876,18 @@ namespace RedDove.Config
 
         internal static ASTNode ParsePath(string source)
         {
-            var parser = new Parser(new StringReader(source));
             ASTNode result;
+            Parser parser;
 
+            // Failure can happen on the very first token ...
+            try
+            {
+                parser = new Parser(new StringReader(source));
+            }
+            catch (RecognizerException)
+            {
+                throw new InvalidPathException($"Invalid path: {source}");
+            }
             if (parser.next.Kind != TokenKind.Word)
             {
                 throw new InvalidPathException($"Invalid path: {source}");
