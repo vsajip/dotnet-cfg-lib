@@ -1176,6 +1176,13 @@ namespace RedDove.Config
                         Advance();
                         kind = ConsumeNewlines();
                     }
+                    else if ((kind != TokenKind.RightCurly) && (kind != TokenKind.EOF))
+                    {
+                        throw new ParserException($"unexpected after key-value: {kind}")
+                        {
+                            Location = next.Start
+                        };
+                    }
                 }
             }
             return result;
@@ -2890,7 +2897,7 @@ namespace RedDove.Config
             }
             if (parser.next.Kind != TokenKind.Word)
             {
-                throw new InvalidPathException($"Invalid path: {source}");
+                throw new InvalidPathException($"Invalid path {source}");
             }
             try
             {
