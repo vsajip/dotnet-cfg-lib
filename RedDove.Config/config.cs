@@ -1,5 +1,4 @@
 using System;
-using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -304,7 +303,7 @@ namespace RedDove.Config
 
         private void PushBack(char c)
         {
-            if ((c != '\0') && ((c == '\n') || !char.IsWhiteSpace(c)))
+            if (c != '\0')
             {
                 pushedBackChars.Push(new Tuple<char, Location>(c, new Location(charLocation)));
             }
@@ -1786,7 +1785,7 @@ namespace RedDove.Config
         }
     }
 
-    public delegate object StringConverter(string s);
+    public delegate object StringConverter(string s, Config cfg);
 
     internal class Evaluator
     {
@@ -2661,9 +2660,10 @@ namespace RedDove.Config
         protected static Regex ISO_DATETIME_PATTERN = new Regex(@"^(\d{4})-(\d{2})-(\d{2})(([ T])(((\d{2}):(\d{2}):(\d{2}))(\.\d{1,6})?(([+-])(\d{2}):(\d{2})(:(\d{2})(\.\d{1,6})?)?)?))?$");
         protected static Regex ENV_VALUE_PATTERN = new Regex(@"^\$(\w+)(\|(.*))?$");
         protected static Regex COLON_OBJECT_PATTERN = new Regex(@"^(([A-Za-z_]\w*(\.[A-Za-z_]\w*)*),)?([A-Za-z_]\w*(\.[A-Za-z_]\w*)*)(:([A-Za-z_]\w*))?$");
+        protected static Regex INTERPOLATION_PATTERN = new Regex(@"\$\{([^}]+)\}");
         protected static object[] NO_PARAMS = new object[] { };
 
-        internal static object DefaultStringConverter(string s)
+        internal static object DefaultStringConverter(string s, Config cfg)
         {
             object result = s;
             var m = ISO_DATETIME_PATTERN.Match(s);
@@ -2806,6 +2806,62 @@ namespace RedDove.Config
                                         }
                                     }
                                 }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var mc = INTERPOLATION_PATTERN.Matches(s);
+                        var n = mc.Count;
+
+                        if (mc.Count > 0)
+                        {
+                            var sb = new StringBuilder();
+                            var cp = 0;
+                            var failed = false;
+
+                            for (var i = 0; i < n; i++)
+                            {
+                                var match = mc[i];
+                                var sp = match.Index;
+                                var ep = sp + match.Length;
+                                var path = match.Groups[1].Value;
+
+                                if (cp < sp)
+                                {
+                                    sb.Append(s.Substring(cp, sp - cp));
+                                }
+
+                                try
+                                {
+                                    var v = cfg[path];
+
+                                    if (v is ISequence)
+                                    {
+                                        v = Utils.SequenceToString(v as ISequence);
+                                    }
+                                    else if (v is IMapping)
+                                    {
+                                        v = Utils.MappingToString(v as IMapping);
+                                    }
+                                    sb.Append(v);
+                                }
+                                catch (Exception)
+                                {
+                                    failed = true;
+                                    break;
+                                }
+                                cp = ep;
+                            }
+
+                            if (!failed)
+                            {
+                                if (cp < s.Length)
+                                {
+                                    sb.Append(s.Substring(cp));
+                                }
+
+                                result = sb.ToString();
                             }
                         }
                     }
@@ -3112,7 +3168,7 @@ namespace RedDove.Config
 
         public object ConvertString(string s)
         {
-            var result = StringConverter(s);
+            var result = StringConverter(s, this);
 
             // The typecast below is to avoid a spurious Visual C# compiler warning
             if (StrictConversions && (result == (object) s))
@@ -3385,6 +3441,58 @@ namespace RedDove.Config
                 result = ((DictWrapper) o).AsDict();
             }
             return result;
+        }
+
+        internal static string SequenceToString(ISequence list)
+        {
+            var items = new List<string>();
+
+            foreach (var item in list)
+            {
+                string s;
+
+                if (item is ISequence)
+                {
+                    s = SequenceToString(item as ISequence);
+                }
+                else if (item is IMapping)
+                {
+                    s = MappingToString(item as IMapping);
+                }
+                else
+                {
+                    s = item.ToString();
+                }
+                items.Add(s);
+            }
+            var contents = string.Join(", ", items);
+            return $"[{contents}]";
+        }
+
+        internal static string MappingToString(IMapping mapping)
+        {
+            var items = new List<string>();
+
+            foreach (var item in mapping)
+            {
+                string s;
+                var v = item.Value;
+                if (v is ISequence)
+                {
+                    s = SequenceToString(v as ISequence);
+                }
+                else if (v is IMapping)
+                {
+                    s = MappingToString(v as IMapping);
+                }
+                else
+                {
+                    s = v.ToString();
+                }
+                items.Add($"{item.Key}: {v}");
+            }
+            var contents = string.Join(", ", items);
+            return $"{{{contents}}}";
         }
     }
 }

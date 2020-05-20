@@ -8,6 +8,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.Numerics;
 using System.Diagnostics;
+using System.Linq.Expressions;
 
 namespace RedDove.Config.Test
 {
@@ -1520,27 +1521,33 @@ namespace RedDove.Config.Test
             Assert.AreEqual(2L, config["computed6"]);
             Assert.AreEqual(new Complex(3, 1), config["c3"]);
             Assert.AreEqual(new Complex(5, 5), config["c4"]);
-            try
-            {
-                Assert.IsNotNull(config["computed7"]);
-                Assert.Fail("expected exception not thrown");
-            }
-            catch (ConfigException ce)
-            {
-                Assert.IsTrue(ce.ToString().Contains("Not found in configuration: float4"));
-            }
-            try
-            {
-                Assert.IsNotNull(config["bad_include"]);
-                Assert.Fail("expected exception not thrown");
-            }
-            catch (ConfigException ce)
-            {
-                Assert.IsTrue(ce.ToString().Contains("@ operand must be a string"));
-            }
             Assert.AreEqual(2L, config["computed8"]);
             Assert.AreEqual(160L, config["computed9"]);
             Assert.AreEqual(62L, config["computed10"]);
+            Assert.AreEqual("A-4 a test_foo True 10 1E-07 1 b [a, c, e, g]Z", config["interp"]);
+            Assert.AreEqual("{a: b}", config["interp2"]);
+
+            // failure cases
+
+            var cases = new[]
+            {
+                new Tuple<string, string>("computed7", "Not found in configuration: float4"),
+                new Tuple<string, string>("bad_include", "@ operand must be a string"),
+                new Tuple<string, string>("bad_interp", "Unable to convert string "), 
+            };
+
+            foreach (var c in cases)
+            {
+                try
+                {
+                    Assert.IsNotNull(config[c.Item1]);
+                    Assert.Fail("expected exception not thrown");
+                }
+                catch (ConfigException ce)
+                {
+                    Assert.IsTrue(ce.ToString().Contains(c.Item2));
+                }
+            }
         }
 
         [TestMethod]
@@ -1565,7 +1572,7 @@ namespace RedDove.Config.Test
                     { "short_name", "address" },
                     { "placeholder", "We need this for delivering to you" },
                     { "ph_i18n", "your-postal-address" },
-                    { "message", "" },
+                    { "message", " " },
                     { "required", true },
                     { "attrs", new Mapping() { { "minlength", 10L } } },
                     { "grpclass", "col-md-6" },
@@ -1577,7 +1584,7 @@ namespace RedDove.Config.Test
                     { "label", "Delivery Instructions" },
                     { "short_name", "notes" },
                     { "placeholder", "Any special delivery instructions?" },
-                    { "message", "" },
+                    { "message", " " },
                     { "label_i18n", "delivery-instructions" },
                     { "ph_i18n", "any-special-delivery-instructions" },
                     { "grpclass", "col-md-6" }
@@ -1599,7 +1606,7 @@ namespace RedDove.Config.Test
                         { "label",  "Verify" },
                         { "type",  "submit" },
                         { "classes",  "btn-primary" } } },
-                    { "message",  "" },
+                    { "message",  " " },
                     { "required",  true }
                 }),
                 new Tuple<string, Mapping>("refs.signup_password_field", new Mapping() {
@@ -1607,7 +1614,7 @@ namespace RedDove.Config.Test
                     { "type", "password" },
                     { "label", "Password" },
                     { "label_i18n", "password" },
-                    { "message", "" },
+                    { "message", " " },
                     { "name", "password" },
                     { "ph_i18n", "password-wanted-on-site" },
                     { "placeholder", "The password you want to use on this site" },
@@ -1622,7 +1629,7 @@ namespace RedDove.Config.Test
                     { "label_i18n", "password-confirmation" },
                     { "placeholder", "The same password, again, to guard against mistyping" },
                     { "ph_i18n", "same-password-again" },
-                    { "message", "" },
+                    { "message", " " },
                     { "toggle", true },
                     { "required", true }
                 }),
@@ -1634,7 +1641,7 @@ namespace RedDove.Config.Test
                     { "label_i18n", "your-name" },
                     { "placeholder", "Your full name" },
                     { "ph_i18n", "your-full-name" },
-                    { "message", "" },
+                    { "message", " " },
                     { "data_source", "user.display_name" },
                     { "required", true },
                     { "attrs",  new Mapping() { { "autofocus", true } } },
@@ -1649,7 +1656,7 @@ namespace RedDove.Config.Test
                     { "placeholder", "If not just the first word in your full name" },
                     { "ph_i18n", "if-not-first-word" },
                     { "data_source", "user.familiar_name" },
-                    { "message", "" },
+                    { "message", " " },
                     { "grpclass", "col-md-6" }
                 }),
                 new Tuple<string, Mapping>("fieldsets.signup_ident[1].contents[0]", new Mapping() {
@@ -1661,7 +1668,7 @@ namespace RedDove.Config.Test
                     { "short_name", "email address" },
                     { "placeholder", "Your email address" },
                     { "ph_i18n", "your-email-address" },
-                    { "message", "" },
+                    { "message", " " },
                     { "required", true },
                     { "data_source", "user.email" },
                     { "grpclass", "col-md-6" }
@@ -1676,7 +1683,7 @@ namespace RedDove.Config.Test
                     { "placeholder", "Your phone number" },
                     { "ph_i18n", "your-phone-number" },
                     { "classes", "numeric" },
-                    { "message", "" },
+                    { "message", " " },
                     { "prepend", new Mapping() { { "icon", "phone" } } },
                     { "attrs", new Mapping() { { "maxlength", 10L } } },
                     { "required", true },
