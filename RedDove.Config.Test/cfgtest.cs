@@ -1895,5 +1895,16 @@ namespace RedDove.Config.Test
 
             Assert.AreEqual(cfg["test.computed6"], 2L);
         }
+
+        [TestMethod]
+        public void NestedIncludePath()
+        {
+            var p = DataFilePath("base", "top.cfg");
+            var cfg = FromPath(p);
+
+            cfg.IncludePath.Add(DataFilePath("derived"));
+            cfg.IncludePath.Add(DataFilePath("another"));
+            Assert.AreEqual(42L, cfg["level1.level2.final"]);
+        }
     }
 }

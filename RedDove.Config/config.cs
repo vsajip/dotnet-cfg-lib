@@ -1862,7 +1862,7 @@ namespace RedDove.Config
             }
             else
             {
-                var cfg = new Config { Context = config.Context, Cached = config.Cached, Parent = config };
+                var cfg = new Config { Context = config.Context, Cached = config.Cached, Parent = config, IncludePath = config.IncludePath, Path = p, RootDir = System.IO.Path.GetDirectoryName(p) };
 
                 cfg.data = cfg.WrapMapping((MappingItems) cnode);
                 result = cfg;
