@@ -1386,9 +1386,13 @@ namespace RedDove.Config.Test
             var strings = (ISequence) config["strings"];
             Assert.AreEqual("Oscar Fingal O'Flahertie Wills Wilde", strings[0]);
             Assert.AreEqual("size: 5\"", strings[1]);
+#if Windows
+            Assert.AreEqual("Triple quoted form\r\ncan span\r\n'multiple' lines", strings[2]);
+            Assert.AreEqual("with \"either\"\r\nkind of 'quote' embedded within", strings[3]);
+#else
             Assert.AreEqual("Triple quoted form\ncan span\n'multiple' lines", strings[2]);
             Assert.AreEqual("with \"either\"\nkind of 'quote' embedded within", strings[3]);
-
+#endif
             // special strings
             Assert.AreEqual(FileAccess.ReadWrite, config["special_value_1"]);
             Assert.AreEqual(Environment.GetEnvironmentVariable("HOME"), config["special_value_2"]);
@@ -1533,7 +1537,7 @@ namespace RedDove.Config.Test
             {
                 new Tuple<string, string>("computed7", "Not found in configuration: float4"),
                 new Tuple<string, string>("bad_include", "@ operand must be a string"),
-                new Tuple<string, string>("bad_interp", "Unable to convert string "), 
+                new Tuple<string, string>("bad_interp", "Unable to convert string "),
             };
 
             foreach (var c in cases)
