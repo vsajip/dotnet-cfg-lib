@@ -625,13 +625,19 @@ namespace RedDove.Config
                     {
                         PushBack(c);
                     }
+                    text.Append(c);
+                    endLocation.Update(location);
+                    endLocation.Column--;
                     kind = TokenKind.Newline;
-                    location.NextLine();
                     break;
                 }
                 if (c == '\\')
                 {
                     c = GetChar();
+                    if (c == '\r')
+                    {
+                        c = GetChar();
+                    }
                     if (c != '\n')
                     {
                         throw new TokenizerException("unexpected \\") { Location = charLocation };
