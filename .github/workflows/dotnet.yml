@@ -25,8 +25,14 @@ jobs:
       run: |
         $env:HOME = $env:HOMEPATH
         echo "Set HOME to $HOME"
-        make
+        cd RedDove.Config
+        dotnet build
+        cd ../RedDove.Config.Test
+        dotnet test
     - name: Run tests on POSIX
       if: ${{ matrix.os != 'windows-latest' }}
       run: |
-        make
+        cd RedDove.Config
+        dotnet build
+        cd ../RedDove.Config.Test
+        dotnet test
