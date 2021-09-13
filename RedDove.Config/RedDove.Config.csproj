@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
-    <Version>0.1.0.0</Version>
+    <Version>0.1.1.0</Version>
     <Authors>Vinay Sajip</Authors>
     <Company>Red Dove Consultants Limited</Company>
     <Product>Red Dove CFG Library</Product>
     <PackageId>RedDove.Config</PackageId>
-    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <AssemblyVersion>0.1.1.0</AssemblyVersion>
     <NeutralLanguage>en</NeutralLanguage>
     <Description>A library to handle the CFG configuration format.</Description>
     <Copyright>Copyright © 2018 Red Dove Consultants Limited</Copyright>
