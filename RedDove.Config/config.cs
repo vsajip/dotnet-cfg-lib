@@ -1611,7 +1611,7 @@ namespace RedDove.Config
         {
             ASTNode result = BitOrExpr();
 
-            while (ComparisonOperators.Contains(next.Kind))
+            if (ComparisonOperators.Contains(next.Kind))
             {
                 TokenKind op = CompOp();
                 result = new BinaryNode(op, result, BitOrExpr());
