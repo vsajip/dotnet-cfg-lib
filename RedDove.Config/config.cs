@@ -5,8 +5,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.Win32.SafeHandles;
 
 namespace RedDove.Config
 {
@@ -255,7 +257,8 @@ namespace RedDove.Config
             {'&', TokenKind.BitwiseAnd},
             {'|', TokenKind.BitwiseOr},
             {'^', TokenKind.BitwiseXor},
-            {'.', TokenKind.Dot}
+            {'.', TokenKind.Dot},
+            {'=', TokenKind.Assign }
         };
 
         protected static Dictionary<string, TokenKind> Keywords = new Dictionary<string, TokenKind>()
@@ -781,24 +784,6 @@ namespace RedDove.Config
                     kind = GetNumber(text, out value, startLocation, endLocation);
                     break;
                 }
-                else if (c == '=')
-                {
-                    char nc = GetChar();
-
-                    if (nc != '=')
-                    {
-                        kind = TokenKind.Assign;
-                        appendChar(c);
-                        PushBack(nc);
-                    }
-                    else
-                    {
-                        kind = TokenKind.Equal;
-                        text.Append(c);
-                        appendChar(c);
-                    }
-                    break;
-                }
                 else if (Punctuation.ContainsKey(c))
                 {
                     kind = Punctuation[c];
@@ -828,6 +813,20 @@ namespace RedDove.Config
                         {
                             appendChar(c);
                             kind = GetNumber(text, out value, startLocation, endLocation);
+                        }
+                    }
+                    else if (c == '=')
+                    {
+                        c = GetChar();
+
+                        if (c != '=')
+                        {
+                            PushBack(c);
+                        }
+                        else
+                        {
+                            appendChar(c);
+                            kind = TokenKind.Equal;
                         }
                     }
                     else if (c == '<')
@@ -1814,6 +1813,14 @@ namespace RedDove.Config
             TokenKind.None
         };
 
+        private bool SamePath(string s1, string s2)
+        {
+            string p1 = Path.GetFullPath(s1);
+            string p2 = Path.GetFullPath(s2);
+
+            return string.Equals(p1, p2, StringComparison.OrdinalIgnoreCase);
+        }
+
         protected object EvalAt(UnaryNode node)
         {
             var o = Evaluate(node.Operand);
@@ -1857,6 +1864,11 @@ namespace RedDove.Config
             if (!found)
             {
                 throw new ConfigException($"Unable to locate {fn}") { Location = node.Start };
+            }
+
+            if ((config.Path != null) && SamePath(config.Path, p))
+            {
+                throw new ConfigException($"Configuration cannot include itself: {fn}") { Location = node.Start };
             }
             var reader = new NamedReader(p);
             var parser = new Parser(reader);

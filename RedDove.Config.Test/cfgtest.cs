@@ -1910,5 +1910,22 @@ namespace RedDove.Config.Test
             cfg.IncludePath.Add(DataFilePath("another"));
             Assert.AreEqual(42L, cfg["level1.level2.final"]);
         }
+
+        [TestMethod]
+        public void TestRecursiveConfiguration()
+        {
+            var p = DataFilePath("derived", "recurse.cfg");
+            var cfg = FromPath(p);
+
+            try
+            {
+                var v = cfg["recurse"];
+                Assert.Fail("Expected exception wasn't thrown");
+            }
+            catch (ConfigException e)
+            {
+                Assert.AreEqual(e.Message, "Configuration cannot include itself: recurse.cfg");
+            }
+        }
     }
 }
