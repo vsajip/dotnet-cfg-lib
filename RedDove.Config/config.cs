@@ -707,10 +707,7 @@ namespace RedDove.Config
                         if (c2 != quote)
                         {
                             PushBack(c2);
-                            if (c2 == '\0')
-                            {
-                                charLocation.Update(c1Loc);
-                            }
+                            charLocation.Update(c1Loc);
                             PushBack(c1);
                         }
                         else
