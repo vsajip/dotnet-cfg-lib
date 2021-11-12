@@ -5,10 +5,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.Win32.SafeHandles;
 
 namespace RedDove.Config
 {
@@ -1871,9 +1869,13 @@ namespace RedDove.Config
             var parser = new Parser(reader);
             var cnode = parser.Container();
 
-            if (!(cnode is MappingItems))
+            if (cnode is ListItems)
             {
                 result = cnode;
+            }
+            else if (!(cnode is MappingItems))
+            {
+                throw new ConfigException($"Unexpected container type: {cnode}") { Location = node.Start };
             }
             else
             {
@@ -2627,6 +2629,7 @@ namespace RedDove.Config
             Context = new Mapping();
             IncludePath = new List<string>();
             StringConverter = DefaultStringConverter;
+            RootDir = Directory.GetCurrentDirectory();
         }
 
         public Config(TextReader reader) : this()
