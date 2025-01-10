@@ -25,10 +25,10 @@ jobs:
       run: |
         wget http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.23_amd64.deb
         sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.23_amd64.deb
-    - name: Setup .NET 5.0.x
+    - name: Setup .NET 6.0.x
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '5.0.x'
+        dotnet-version: '6.0.x'
     #- name: Setup .NET
       #uses: actions/setup-dotnet@v4
       #with:
