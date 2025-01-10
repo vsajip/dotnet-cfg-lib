@@ -1744,7 +1744,10 @@ namespace RedDove.Config
                 }
                 else
                 {
-                    result = config.GetFromPath(key);
+                    var e = config.Evaluator;
+                    e.refsSeen.Clear();
+                    result = e.GetFromPath(Config.ParsePath(key));
+                    // result = config.GetFromPath(key);
                 }
                 // There is already caching available at the config level
                 // so not sure if this is needed (was to avoid recomputations)
@@ -3137,7 +3140,10 @@ namespace RedDove.Config
                     // Treat as a path
                     try
                     {
-                        result = GetFromPath(key);
+                        var e = Evaluator;
+                        
+                        e.refsSeen.Clear();
+                        result = e.GetFromPath(ParsePath(key));
                         doEval = false;
                     }
                     catch (InvalidPathException)
@@ -3178,11 +3184,11 @@ namespace RedDove.Config
             return Get(key, MISSING);
         }
 
-        internal object GetFromPath(string path)
-        {
-            Evaluator.refsSeen.Clear();
-            return Evaluator.GetFromPath(ParsePath(path));
-        }
+        //internal object GetFromPath(string path)
+        //{
+        //    Evaluator.refsSeen.Clear();
+        //    return Evaluator.GetFromPath(ParsePath(path));
+        //}
 
         public object ConvertString(string s)
         {

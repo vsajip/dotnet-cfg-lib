@@ -8,7 +8,6 @@ using System;
 using System.Text.RegularExpressions;
 using System.Numerics;
 using System.Diagnostics;
-using System.Linq.Expressions;
 
 namespace RedDove.Config.Test
 {
@@ -431,7 +430,7 @@ namespace RedDove.Config.Test
             parts[0] = "resources";
 
             Array.Copy(pathComponents, 0, parts, 1, n);
-            return Path.GetFullPath(Path.Combine(parts));
+            return Path.Combine(parts);
         }
 
         [TestMethod]
@@ -1890,14 +1889,20 @@ namespace RedDove.Config.Test
         }
 
         [TestMethod]
-        public void AbsoluteIncludePath()
+        public void IncludePaths()
         {
-            var p = DataFilePath("derived", "test.cfg");
-            var source = $"test: @ '{p.Replace('\\', '/')}'";
-            var reader = new StringReader(source);
-            var cfg = new Config(reader);
+            var p1 = DataFilePath("derived", "test.cfg");
+            var p2 = Path.GetFullPath(p1);
+            var plist = new [] {p1, p2};
 
-            Assert.AreEqual(cfg["test.computed6"], 2L);
+            foreach (var p in plist)
+            {
+                var source = $"test: @ '{p.Replace('\\', '/')}'";
+                var reader = new StringReader(source);
+                var cfg = new Config(reader);
+
+                Assert.AreEqual(cfg["test.computed6"], 2L);
+            }
         }
 
         [TestMethod]
