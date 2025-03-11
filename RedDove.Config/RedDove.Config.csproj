@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net6.0;net8.0;netstandard2.1</TargetFrameworks>
     <Version>0.1.1.0</Version>
     <Authors>Vinay Sajip</Authors>
     <Company>Red Dove Consultants Limited</Company>
